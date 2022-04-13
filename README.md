@@ -7,6 +7,45 @@ Description:    Ubuntu 18.04.6 LTS
 Release:        18.04
 Codename:       bionic
 ```
+Tested jetpack version
+```bash
+ulas@ulas:~$ sudo apt-cache show nvidia-jetpack
+[sudo] password for ulas:
+Package: nvidia-jetpack
+Version: 4.6-b199
+Architecture: arm64
+Maintainer: NVIDIA Corporation
+Installed-Size: 194
+Depends: nvidia-cuda (= 4.6-b199), nvidia-opencv (= 4.6-b199), nvidia-cudnn8 (= 4.6-b199), nvidia-tensorrt (= 4.6-b199), nvidia-visionworks (= 4.6-b199), nvidia-container (= 4.6-b199), nvidia-vpi (= 4.6-b199), nvidia-l4t-jetson-multimedia-api (>> 32.6-0), nvidia-l4t-jetson-multimedia-api (<< 32.7-0)
+Homepage: http://developer.nvidia.com/jetson
+Priority: standard
+Section: metapackages
+Filename: pool/main/n/nvidia-jetpack/nvidia-jetpack_4.6-b199_arm64.deb
+Size: 29368
+SHA256: 69df11e22e2c8406fe281fe6fc27c7d40a13ed668e508a592a6785d40ea71669
+SHA1: 5c678b8762acc54f85b4334f92d9bb084858907a
+MD5sum: 1b96cd72f2a434e887f98912061d8cfb
+Description: NVIDIA Jetpack Meta Package
+Description-md5: ad1462289bdbc54909ae109d1d32c0a8
+
+Package: nvidia-jetpack
+Version: 4.6-b197
+Architecture: arm64
+Maintainer: NVIDIA Corporation
+Installed-Size: 194
+Depends: nvidia-cuda (= 4.6-b197), nvidia-opencv (= 4.6-b197), nvidia-cudnn8 (= 4.6-b197), nvidia-tensorrt (= 4.6-b197), nvidia-visionworks (= 4.6-b197), nvidia-container (= 4.6-b197), nvidia-vpi (= 4.6-b197), nvidia-l4t-jetson-multimedia-api (>> 32.6-0), nvidia-l4t-jetson-multimedia-api (<< 32.7-0)
+Homepage: http://developer.nvidia.com/jetson
+Priority: standard
+Section: metapackages
+Filename: pool/main/n/nvidia-jetpack/nvidia-jetpack_4.6-b197_arm64.deb
+Size: 29356
+SHA256: 104cd0c1efefe5865753ec9b0b148a534ffdcc9bae525637c7532b309ed44aa0
+SHA1: 8cca8b9ebb21feafbbd20c2984bd9b329a202624
+MD5sum: 463d4303429f163b97207827965e8fe0
+Description: NVIDIA Jetpack Meta Package
+Description-md5: ad1462289bdbc54909ae109d1d32c0a8
+```
+
 Darknet commit number:
 ```bash
 ulas@ulas:~/darknet$ git log --oneline
