@@ -101,6 +101,81 @@ for gstreamer ( should be builded or installed )
 
 I compiled opencv myself. The version is 4.4.0. If you want to build yourself, use the script to build the opencv. It will delete the old ones. Script is tested on nano only.
 
+## Train the model
+Before starting the training I created a directory inside the darknet directoy. That means binary is located in one above directory. It does not matter as long as you are able to give the correct paths for images and related configuration files then you can run the binary from wherever you want.
+```bash
+mkdir trainingYolov4 && cd trainingYolov4
+```
+
+I used wider face dataset to train the model. Also transfer learning is used.
+Install the zip files from http://shuoyang1213.me/WIDERFACE/
+unzip them. There are three zip files.
+First one is for training. Second one is for validation for the images.
+Last one has the txt files which holds the related position data. But these data should be in the same file with images and with same name. We will handle this later with single python script.
+
+```bash
+unzip ../../drive/MyDrive/WIDER_train.zip
+unzip ../../drive/MyDrive/WIDER_val.zip
+unzip ../../drive/MyDrive/wider_face_split.zip
+```
+After this lets create txt file for each picture for yolo.
+Before start edit the file for absolute paths
+In the code:
+```bash
+train_set_dir = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/WIDER_train/images'
+val_set_dir = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/WIDER_val/images'
+
+train_gt = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/wider_face_split/wider_face_train_bbx_gt.txt'
+val_gt = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/wider_face_split/wider_face_val_bbx_gt.txt
+```
+
+```bash
+wget https://raw.githubusercontent.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/master/make_annotation.py
+python3 make_annotation.py
+```
+After this check the each directory for images you will see txt files for each image. Additionaly this script will produce two txt files where you run it. train.txt and val.txt. These txt files have all pictures absolute paths.
+We will need it in the obj.data file (which is the yolo).
+
+Get related configration files
+```bash
+wget https://raw.githubusercontent.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/master/make_annotation.py
+#check the related part in the darknet repo for this
+wget https://raw.githubusercontent.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/master/yolo/yolov4-tiny-3l.cfg
+wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4-tiny.conv.29
+wget https://raw.githubusercontent.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/master/yolo/obj.names
+wget https://raw.githubusercontent.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/master/yolo/obj.data
+```
+yolov4-tiny.conv.2 is the training model that we can use it for transfer learning even if it was not trained for our desired object.
+
+create a yolo directory and put obj.data, obj.names and cfg file to this directory
+```bash
+mkdir yolo
+mv -t yolo obj.data obj.names yolov4-tiny-3l.cfg
+```
+In obj.data update the paths for train.txt and val.txt which is produced by the annotayion.py file.
+```bash
+train = /content/drive/MyDrive/trainingFace/darknet/trainingYolo/train.txt
+valid = /content/drive/MyDrive/trainingFace/darknet/trainingYolo/val.txt
+```
+If you do not run the darknet binary under the darknet directory, during the traning it will look for bakcup directory. So lets create here one.
+otherwise training will fail
+```bash
+mkdir backup
+```
+Start training with
+```bash
+./../darknet detector train yolo/obj.data yolo/yolov4-tiny-3l.cfg yolov4-tiny.conv.29 backup\yolov4-tiny-3l_last.weights -map -dont_show
+```
+
+If you run these command on colab then be sure GPU is active
+```bash
+!nvidia-smi
+```
+
+You can check the process from chart.png in the same directory
+
+![](https://github.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/chart_yolov4-tiny-3l.png?raw=true)
+
 ## Run the example with python
 If examples are working. At least the one for picture. Then we can use python wrappers to call darknet.so file and use desired functions inside the python. 
 Here it will be good to use opencv with python. Everything will be more easy.
