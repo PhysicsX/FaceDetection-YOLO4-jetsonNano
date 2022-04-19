@@ -174,7 +174,7 @@ If you run these command on colab then be sure GPU is active
 
 You can check the process from chart.png in the same directory
 
-![](https://github.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/chart_yolov4-tiny-3l.png?raw=true)
+![](https://github.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/blob/master/chart_yolov4-tiny-3l.png?raw=true)
 
 ## Run the example with python
 If examples are working. At least the one for picture. Then we can use python wrappers to call darknet.so file and use desired functions inside the python. 
