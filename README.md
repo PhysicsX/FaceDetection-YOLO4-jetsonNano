@@ -176,6 +176,16 @@ You can check the process from chart.png in the same directory
 
 ![](https://github.com/PhysicsX/FaceDetection-YOLO4-jetsonNano/blob/master/chart_yolov4-tiny-3l.png?raw=true)
 
+Also it is a good idea to check the mAP (Mean Average Precision). (be careful with the paths, below command needs to find train.txt, names.list.)
+```bash
+./darknet detector map /yolo/yolov4-tiny-3l.cfg yolo/yolov4-tiny-3l_last.weights
+```
+Above command may return something like:
+```bash
+IoU threshold = 50 %, used Area-Under-Curve for each unique Recall
+mean average precision (mAP@0.50) = 0.400207, or 42.02 % 
+```
+
 ## Run the example with python
 If examples are working. At least the one for picture. Then we can use python wrappers to call darknet.so file and use desired functions inside the python. 
 Here it will be good to use opencv with python. Everything will be more easy.
