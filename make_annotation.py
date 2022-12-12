@@ -47,11 +47,11 @@ def gen_txt(img_dir, gt_file, outfile):
 
 if __name__ == '__main__':
 
-    train_set_dir = '/home/khang/Khang/data/wider/train/WIDER_train/images'
-    val_set_dir = '/home/khang/Khang/data/wider/val/WIDER_val/images'
+    train_set_dir = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/WIDER_train/images'
+    val_set_dir = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/WIDER_val/images'
 
-    train_gt = '/home/khang/Khang/data/wider/wider_face_split/wider_face_train_bbx_gt.txt'
-    val_gt = '/home/khang/Khang/data/wider/wider_face_split/wider_face_val_bbx_gt.txt'
+    train_gt = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/wider_face_split/wider_face_train_bbx_gt.txt'
+    val_gt = '/content/drive/MyDrive/trainingFace/darknet/trainingYolo/wider_face_split/wider_face_val_bbx_gt.txt'
 
     gen_txt(train_set_dir, train_gt, 'train.txt')
     gen_txt(val_set_dir, val_gt, 'val.txt')

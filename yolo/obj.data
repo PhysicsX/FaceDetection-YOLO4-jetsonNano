@@ -1,2 +1,5 @@
 classes = 1
+train = /content/drive/MyDrive/trainingFace/darknet/trainingYolo/train.txt
+valid = /content/drive/MyDrive/trainingFace/darknet/trainingYolo/val.txt
 names = yolo/obj.names
+backup = backup
