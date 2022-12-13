@@ -2,6 +2,11 @@
 #include <darknet.h>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
+#include <opencv4/opencv2/highgui/highgui.hpp>
+#include <opencv4/opencv2/imgproc/imgproc.hpp>
+
+// g++ -o example main.cpp -I /home/ulas/darknet/include/ -L . -ldarknet `pkg-config --cflags --libs opencv4` && ./example
+
 using namespace std;
 using namespace cv;
 
@@ -20,7 +25,6 @@ int main() {
     // Path to a file describing classes names.
     static char *names_file = const_cast<char *>("yolo/obj.data");
     // This is an image to test.
-    static char *input = const_cast<char *>("/home/yurii/Pictures/road_signs/max_50.jpg");
     // Define thresholds for predicted class.
     float thresh = 0.5;
     float hier_thresh = 0.5;
@@ -39,10 +43,11 @@ int main() {
     metadata met = get_metadata(names_file);
 
     std::cout<<"classes "<<met.classes<<std::endl;
+    char* className;
     for (char ** p = met.names; *p; ++p) // or "*p != NULL"  
     {
-	char * temp = *p;
-	std::cout<<temp<<std::endl;
+	className = *p;
+	std::cout<<className<<std::endl;
     }
 
     std::cout<<network_width(net)<<std::endl;
@@ -51,11 +56,33 @@ int main() {
 
     //Mat image;
     Mat image = imread("/home/ulas/FaceDetection-YOLO4-jetsonNano/face.png");
-	String windowName = "Example";
-	namedWindow(windowName);
-	imshow(windowName, image);
-	waitKey(0);
-	destroyWindow(windowName);
+    Mat imageRgb;
+    cvtColor(image, imageRgb, cv::COLOR_BGR2RGB);
+    Mat imageResized;
+    resize(imageRgb, imageResized, Size(network_width(net), network_height(net)), INTER_LINEAR);
+    
+    int size = imageResized.total() * imageResized.elemSize();
+    char* bytes = new char[size];
+    std::memcpy(bytes, imageResized.data, size*sizeof(char));
+    copy_image_from_bytes(im, bytes);   
+    // detect_image(net, className, im, 0.5);
+    float* fp = network_predict_image(net, im);
+    int map ;
+    int map2;
+    detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, &map2, 0, &map, 0);
+    std::cout<<"x :"<<det->bbox.x<<std::endl;
+
+    cv::rectangle(imageResized, cv::Rect((det->bbox.x-det->bbox.w/2),
+			    (det->bbox.y - det->bbox.h/2), 
+			    det->bbox.w, det->bbox.h), 
+		            cv::Scalar(0, 255, 0));
+
+
+    String windowName = "Example";
+    namedWindow(windowName);
+    imshow(windowName, imageResized);  
+    waitKey(0);
+    destroyWindow(windowName);
 
 //    free_detections(detections, num_boxes);
 //    free_image(im);
