@@ -11,32 +11,16 @@ using namespace std;
 using namespace cv;
 
 int main() {
-    cout << "Darknet application" << endl;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Define constants that were used when Darknet network was trained.
-    // This is pretty much hardcoded code zone, just to give an idea what is needed.
-    // -----------------------------------------------------------------------------------------------------------------
-
+    
     // Path to configuration file.
     static char *cfg_file = const_cast<char *>("yolo/yolov4-tiny-3l.cfg");
     // Path to weight file.
     static char *weight_file = const_cast<char *>("yolo/yolov4-tiny-3l_best.weights");
     // Path to a file describing classes names.
     static char *names_file = const_cast<char *>("yolo/obj.data");
-    // This is an image to test.
-    // Define thresholds for predicted class.
     float thresh = 0.5;
     float hier_thresh = 0.5;
  
-
-
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Do actual logic of classes prediction.
-    // -----------------------------------------------------------------------------------------------------------------
-
-    // Load Darknet network itself.
     network *net = load_network_custom(cfg_file, weight_file, 0, 1);
     std::cout<<"w "<<net->w<<std::endl;
 
@@ -55,7 +39,7 @@ int main() {
     image im = make_image(network_width(net), network_height(net), 3);
 
     //Mat image;
-    Mat image = imread("/home/ulas/FaceDetection-YOLO4-jetsonNano/face.png");
+    Mat image = imread("/home/ulas/FaceDetection-YOLO4-jetsonNano/face3.jpg");
     Mat imageRgb;
     cvtColor(image, imageRgb, cv::COLOR_BGR2RGB);
     Mat imageResized;
@@ -65,29 +49,41 @@ int main() {
     char* bytes = new char[size];
     std::memcpy(bytes, imageResized.data, size*sizeof(char));
     copy_image_from_bytes(im, bytes);   
-    // detect_image(net, className, im, 0.5);
+    
     float* fp = network_predict_image(net, im);
-    int map ;
-    int map2;
-    detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, &map2, 0, &map, 0);
-    std::cout<<"x :"<<det->bbox.x<<std::endl;
+    int number_boxes;
+    int map;
+    detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, nullptr, 0, &number_boxes, 0);
+ 
+    do_nms_sort(det, number_boxes, 1, 0.45);
+    std::cout<<"Detection "<<number_boxes<<" obj, class"<<det->classes<<std::endl;
 
-    cv::rectangle(imageResized, cv::Rect((det->bbox.x-det->bbox.w/2),
-			    (det->bbox.y - det->bbox.h/2), 
-			    det->bbox.w, det->bbox.h), 
-		            cv::Scalar(0, 255, 0));
+    for(int i=0; i<number_boxes; ++i)
+    {
+    	for(int j=0; j<1; ++j)
+	{
+	    if(det[i].prob[j] > 0.5) 
+	    {	
+	        std::cout<<"x :"<<det[i].bbox.x<<" y :"<<det[i].bbox.y<<" w :"<<det[i].bbox.w<<" h :"<<det[i].bbox.h<<std::endl; 
+	   
+	        cv::rectangle(imageResized, cv::Rect((det[i].bbox.x-det[i].bbox.w/2),
+			                             (det[i].bbox.y - det[i].bbox.h/2), 
+			                              det[i].bbox.w, det[i].bbox.h), 
+		                                      cv::Scalar(0, 255, 0), 2);
 
+	   	std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
+	   }
+	}
+    }
+    
+    free_detections(det, number_boxes);
+    free_image(im);
 
-    String windowName = "Example";
+    String windowName = "Face Detection Yolo";
     namedWindow(windowName);
     imshow(windowName, imageResized);  
     waitKey(0);
     destroyWindow(windowName);
-
-//    free_detections(detections, num_boxes);
-//    free_image(im);
-//    free_image(sized);
-//    free(labels);
 
     return 0;
 }
