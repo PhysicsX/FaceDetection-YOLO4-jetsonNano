@@ -77,7 +77,9 @@ int main() {
     }
     
     free_detections(det, number_boxes);
-    free_image(im);
+    free_image(im);  
+    free_network_ptr(net);
+    delete[] bytes;
 
     String windowName = "Face Detection Yolo";
     namedWindow(windowName);
