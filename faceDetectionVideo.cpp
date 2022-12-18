@@ -37,10 +37,12 @@ int main() {
 
     std::cout<<network_width(net)<<std::endl;
     std::cout<<network_height(net)<<std::endl;
-     
+    
+    int widthFrame = 800;
+    int heightFrame = 480;
     std::string pipeline = "nvarguscamerasrc sensor-id=" +std::to_string(0) +
-		" ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(800) +
-		", height=(int)" + std::to_string(480) +
+		" ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(widthFrame) +
+		", height=(int)" + std::to_string(heightFrame) +
 		", format=(string)NV12, framerate=(fraction)" + std::to_string(30) +
 		"/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
 
@@ -49,6 +51,16 @@ int main() {
     image im = make_image(network_width(net), network_height(net), 3);
     cv::VideoCapture cap;
     cap.open(pipeline, cv::CAP_GSTREAMER);
+	
+    float wS = net->w;
+    float hS = net->h;
+    float wT = 800;
+    float hT = 480;
+
+    float wScale = wT/wS;
+    float hScale = hT/hS;
+    std::cout<<"wScale "<<wScale<<std::endl;
+    std::cout<<"hScale "<<hScale<<std::endl;
  
     while(true)
     {
@@ -72,19 +84,27 @@ int main() {
     	detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, nullptr, 0, &number_boxes, 0);
  
     	do_nms_sort(det, number_boxes, 1, 0.45);
+	if(0 != number_boxes)
     	std::cout<<"Detection "<<number_boxes<<" obj, class"<<det->classes<<std::endl;
-
+       
     	for(int i=0; i<number_boxes; ++i)
     	{
     		for(int j=0; j<1; ++j)
 		{
 	    		if(det[i].prob[j] > 0.5) 
 	    		{	
-	        		std::cout<<"x :"<<det[i].bbox.x<<" y :"<<det[i].bbox.y<<" w :"<<det[i].bbox.w<<" h :"<<det[i].bbox.h<<std::endl; 
-	   
-	        		cv::rectangle(imageResized, cv::Rect((det[i].bbox.x-det[i].bbox.w/2),
-			                             (det[i].bbox.y - det[i].bbox.h/2), 
-			                              det[i].bbox.w, det[i].bbox.h), 
+	        		// std::cout<<"x :"<<det[i].bbox.x<<" y :"<<det[i].bbox.y<<" w :"<<det[i].bbox.w<<" h :"<<det[i].bbox.h<<std::endl; 
+	                        
+				int x = det[i].bbox.x * wScale;
+				int y = det[i].bbox.y * hScale; 
+	        	        int w = det[i].bbox.w * wScale; 	
+				int h = det[i].bbox.h * hScale;
+			       std::cout<<"xS :"<<x<<" yS :"<<y<<" wS :"<<w<<" hS :"<<h<<std::endl; 
+	                        
+	
+				cv::rectangle(frame, cv::Rect((x - (w/2)),
+			                             (y - (h/2)), 
+			                              w, h), 
 		                                      cv::Scalar(0, 255, 0), 2);
 
 	   			std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
@@ -92,7 +112,7 @@ int main() {
 		}
     	}
     
-    	imshow("video", imageResized);
+    	imshow("video", frame);
     
     	if(waitKey(1) == 27)
 	    	break;
