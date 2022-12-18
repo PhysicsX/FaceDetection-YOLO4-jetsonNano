@@ -20,8 +20,6 @@ int main() {
     static char *weight_file = const_cast<char *>("yolo/yolov4-tiny-3l_best.weights");
     // Path to a file describing classes names.
     static char *names_file = const_cast<char *>("yolo/obj.data");
-    float thresh = 0.5;
-    float hier_thresh = 0.5;
  
     network *net = load_network_custom(cfg_file, weight_file, 0, 1);
     std::cout<<"w "<<net->w<<std::endl;
@@ -29,6 +27,7 @@ int main() {
     metadata met = get_metadata(names_file);
 
     std::cout<<"classes "<<met.classes<<std::endl;
+    // for this example there is only one class 
     char* className;
     for (char ** p = met.names; *p; ++p) // or "*p != NULL"  
     {
@@ -54,11 +53,11 @@ int main() {
     while(true)
     {
 
-    	cv::Mat image;
-    	cap.read(image);
+    	cv::Mat frame;
+    	cap.read(frame);
   
     	Mat imageRgb;
-    	cvtColor(image, imageRgb, cv::COLOR_BGR2RGB);
+    	cvtColor(frame, imageRgb, cv::COLOR_BGR2RGB);
     	Mat imageResized;
     	resize(imageRgb, imageResized, Size(network_width(net), network_height(net)), INTER_LINEAR);
     
