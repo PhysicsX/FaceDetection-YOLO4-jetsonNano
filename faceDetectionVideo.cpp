@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include <darknet.h>
 #include <opencv4/opencv2/opencv.hpp>
@@ -78,11 +79,14 @@ int main() {
     	std::memcpy(bytes, imageResized.data, size*sizeof(char));
     	copy_image_from_bytes(im, bytes);   
     
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     	float* fp = network_predict_image(net, im);
     	int number_boxes;
     	detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, nullptr, 0, &number_boxes, 0);
  
     	do_nms_sort(det, number_boxes, 1, 0.45);
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 	if(0 != number_boxes)
     	std::cout<<"Detection "<<number_boxes<<" obj, class"<<det->classes<<std::endl;
        
@@ -102,7 +106,8 @@ int main() {
 	                        
 	
 			        rectangle(frame, Rect((x - (w/2)), (y - (h/2)), w, h), Scalar(0, 255, 0), 2);
-	   			std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
+	   			putText(frame, "Detection time: "+std::to_string(time)+" msec, fps: "+std::to_string(1000.0/(time)), Point(20,40), cv::FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 0, 0), 2);
+				std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
 	   		}
 		}
     	}
