@@ -38,9 +38,9 @@ int main() {
     std::cout<<network_width(net)<<std::endl;
     std::cout<<network_height(net)<<std::endl;
     
-    int widthFrame = 800;
-    int heightFrame = 480;
-    std::string pipeline = "nvarguscamerasrc sensor-id=" +std::to_string(0) +
+    const int widthFrame = 800;
+    const int heightFrame = 480;
+    const std::string pipeline = "nvarguscamerasrc sensor-id=" +std::to_string(0) +
 		" ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(widthFrame) +
 		", height=(int)" + std::to_string(heightFrame) +
 		", format=(string)NV12, framerate=(fraction)" + std::to_string(30) +
@@ -52,20 +52,20 @@ int main() {
     cv::VideoCapture cap;
     cap.open(pipeline, cv::CAP_GSTREAMER);
 	
-    float wS = net->w;
-    float hS = net->h;
-    float wT = 800;
-    float hT = 480;
+    const float wS = net->w;
+    const float hS = net->h;
+    const float wT = 800;
+    const float hT = 480;
 
-    float wScale = wT/wS;
-    float hScale = hT/hS;
+    const float wScale = wT/wS;
+    const float hScale = hT/hS;
     std::cout<<"wScale "<<wScale<<std::endl;
     std::cout<<"hScale "<<hScale<<std::endl;
  
     while(true)
     {
 
-    	cv::Mat frame;
+    	Mat frame;
     	cap.read(frame);
   
     	Mat imageRgb;
@@ -73,14 +73,13 @@ int main() {
     	Mat imageResized;
     	resize(imageRgb, imageResized, Size(network_width(net), network_height(net)), INTER_LINEAR);
     
-    	int size = imageResized.total() * imageResized.elemSize();
+    	const int size = imageResized.total() * imageResized.elemSize();
     	char* bytes = new char[size];
     	std::memcpy(bytes, imageResized.data, size*sizeof(char));
     	copy_image_from_bytes(im, bytes);   
     
     	float* fp = network_predict_image(net, im);
     	int number_boxes;
-    	int map;
     	detection* det = get_network_boxes(net, im.w, im.h, 0.5, 0.5, nullptr, 0, &number_boxes, 0);
  
     	do_nms_sort(det, number_boxes, 1, 0.45);
@@ -95,24 +94,20 @@ int main() {
 	    		{	
 	        		// std::cout<<"x :"<<det[i].bbox.x<<" y :"<<det[i].bbox.y<<" w :"<<det[i].bbox.w<<" h :"<<det[i].bbox.h<<std::endl; 
 	                        
-				int x = det[i].bbox.x * wScale;
-				int y = det[i].bbox.y * hScale; 
-	        	        int w = det[i].bbox.w * wScale; 	
-				int h = det[i].bbox.h * hScale;
-			       std::cout<<"xS :"<<x<<" yS :"<<y<<" wS :"<<w<<" hS :"<<h<<std::endl; 
+				const int x = det[i].bbox.x * wScale;
+				const int y = det[i].bbox.y * hScale; 
+	        	        const int w = det[i].bbox.w * wScale; 	
+				const int h = det[i].bbox.h * hScale;
+			        std::cout<<"xS :"<<x<<" yS :"<<y<<" wS :"<<w<<" hS :"<<h<<std::endl; 
 	                        
 	
-				cv::rectangle(frame, cv::Rect((x - (w/2)),
-			                             (y - (h/2)), 
-			                              w, h), 
-		                                      cv::Scalar(0, 255, 0), 2);
-
+			        rectangle(frame, Rect((x - (w/2)), (y - (h/2)), w, h), Scalar(0, 255, 0), 2);
 	   			std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
 	   		}
 		}
     	}
     
-    	imshow("video", frame);
+    	imshow("Face Detection Yolo", frame);
     
     	if(waitKey(1) == 27)
 	    	break;
