@@ -10,9 +10,6 @@
 
 // g++ -o example faceDetectionVideo.cpp -I /home/ulas/darknet/include/ -L . -ldarknet `pkg-config --cflags --libs opencv4` && ./example
 
-using namespace std;
-using namespace cv;
-
 int main() {
     
     // Path to configuration file.
@@ -66,13 +63,13 @@ int main() {
     while(true)
     {
 
-    	Mat frame;
+	cv::Mat frame;
     	cap.read(frame);
   
-    	Mat imageRgb;
-    	cvtColor(frame, imageRgb, cv::COLOR_BGR2RGB);
-    	Mat imageResized;
-    	resize(imageRgb, imageResized, Size(network_width(net), network_height(net)), INTER_LINEAR);
+	cv::Mat imageRgb;
+	cv::cvtColor(frame, imageRgb, cv::COLOR_BGR2RGB);
+	cv::Mat imageResized;
+	cv::resize(imageRgb, imageResized, cv::Size(network_width(net), network_height(net)), cv::INTER_LINEAR);
     
     	const int size = imageResized.total() * imageResized.elemSize();
     	char* bytes = new char[size];
@@ -105,16 +102,16 @@ int main() {
 			        std::cout<<"xS :"<<x<<" yS :"<<y<<" wS :"<<w<<" hS :"<<h<<std::endl; 
 	                        
 	
-			        rectangle(frame, Rect((x - (w/2)), (y - (h/2)), w, h), Scalar(0, 255, 0), 2);
-	   			putText(frame, "Detection time: "+std::to_string(time)+" msec, fps: "+std::to_string(1000.0/(time)), Point(20,40), cv::FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 0, 0), 2);
+				cv::rectangle(frame, cv::Rect((x - (w/2)), (y - (h/2)), w, h), cv::Scalar(0, 255, 0), 2);
+				cv::putText(frame, "Detection time: "+std::to_string(time)+" msec, fps: "+std::to_string(1000.0/(time)), cv::Point(20,40), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255, 0, 0), 2);
 				std::cout<<(int)(det[i].prob[j]*100)<<std::endl;
 	   		}
 		}
     	}
     
-    	imshow("Face Detection Yolo", frame);
+	cv::imshow("Face Detection Yolo", frame);
     
-    	if(waitKey(1) == 27)
+    	if(cv::waitKey(1) == 27)
 	    	break;
    
    	free_detections(det, number_boxes);
