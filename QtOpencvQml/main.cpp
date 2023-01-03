@@ -19,6 +19,7 @@
 #include <utility>
 #include <mutex>
 #include <iostream>
+#include <thread>
 
 int main(int argc, char *argv[])
 {
@@ -41,11 +42,11 @@ int main(int argc, char *argv[])
     QTimer timer;
 
     // Path to configuration file.
-    static char *cfg_file = const_cast<char *>("yolo/yolov4-tiny-3l.cfg");
+    static char *cfg_file = const_cast<char *>("/home/ulas/FaceDetection-YOLO4-jetsonNano/yolo/yolov4-tiny-3l.cfg");
     // Path to weight file.
-    static char *weight_file = const_cast<char *>("yolo/yolov4-tiny-3l_best.weights");
+    static char *weight_file = const_cast<char *>("/home/ulas/FaceDetection-YOLO4-jetsonNano/yolo/yolov4-tiny-3l_best.weights");
     // Path to a file describing classes names.
-    static char *names_file = const_cast<char *>("yolo/obj.data");
+    static char *names_file = const_cast<char *>("/home/ulas/FaceDetection-YOLO4-jetsonNano/yolo/obj.data");
 
 
     network *net = load_network_custom(cfg_file, weight_file, 0, 1);
@@ -88,11 +89,15 @@ int main(int argc, char *argv[])
     std::cout<<"hScale "<<hScale<<std::endl;
 
     cv::Mat frameClone;
-    std::vector<std::vector<int>> coordinates;
+    std::vector<std::vector<int>> coordinates, vecCopy;
     std::mutex m;
 
-    QObject::connect(&timer, &QTimer::timeout, [&]()
+    //QObject::connect(&timer, &QTimer::timeout, [&]()
+    std::thread([&]()
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+        
+	while(1){
     	cv::Mat imageRgb;
 	
 	m.lock();
@@ -132,9 +137,12 @@ int main(int argc, char *argv[])
 
 	free_detections(det, number_boxes);
    	delete[] bytes;
+	}
 
-    });
-    timer.start(10);
+    }).detach();
+    //timer.start(10);
+    //
+
     while(true)
     { 
         cv::Mat frame;
@@ -142,8 +150,11 @@ int main(int argc, char *argv[])
 	
 	m.lock();
 	frameClone = frame.clone();
-	auto vecCopy = coordinates;
-	coordinates.clear();
+	if(!coordinates.empty())
+	{
+		vecCopy = coordinates;
+		coordinates.clear();
+	}
 	m.unlock();
 
         if(frame.empty())
