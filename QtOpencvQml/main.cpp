@@ -142,18 +142,24 @@ int main(int argc, char *argv[])
     }).detach();
     //timer.start(10);
     //
-
+    int cnt {0};
     while(true)
     { 
         cv::Mat frame;
 	cap >> frame;
 	
 	m.lock();
+	cnt ++;
 	frameClone = frame.clone();
 	if(!coordinates.empty())
-	{
+	{  
+	 	cnt = 0;
 		vecCopy = coordinates;
 		coordinates.clear();
+	}
+	if(cnt == 10)
+	{
+		vecCopy.clear();
 	}
 	m.unlock();
 
