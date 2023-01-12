@@ -21,6 +21,11 @@
 #include <iostream>
 #include <thread>
 
+// sudo su
+// export LD_LIBRARY_PATH=/home/ulas/FaceDetection-YOLO4-jetsonNano
+// ./QtOpencvQml -platform eglf
+//
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
