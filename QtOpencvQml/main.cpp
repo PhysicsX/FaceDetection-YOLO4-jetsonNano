@@ -166,8 +166,8 @@ int main(int argc, char *argv[])
         if(frame.empty())
 	{
 		// to clean lsat frame
-		int width = 100;
-		int height = 200;
+		const int width = 100;
+		const int height = 200;
 		QImage image = QPixmap(width, height).toImage();
 		
 		ptrQmlType->updateImage(image);
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
         	break;
 	}
 
-	for(auto v : vecCopy)
+	for(const auto& v : vecCopy)
 	{
 		cv::rectangle(frame, cv::Rect((v[0] - (v[2]/2)), (v[1] - (v[3]/2)), v[2], v[3]), cv::Scalar(0, 255, 0), 2);
 	
