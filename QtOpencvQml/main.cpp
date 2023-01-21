@@ -3,8 +3,9 @@
 #include <QQmlContext>
 #include <QDebug>
 #include <QImage>
+#include "../darknet.h"
 
-#include <../darknet.h>
+//#include </home/ulas/FaceDetection-YOLO4-jetsonNano/darknet.h>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/highgui/highgui.hpp>
@@ -14,7 +15,6 @@
 #include <QObject>
 #include <QQuickPaintedItem>
 #include "qmlType.h"
-
 #include <vector>
 #include <utility>
 #include <mutex>
@@ -25,6 +25,8 @@
 // export LD_LIBRARY_PATH=/home/ulas/FaceDetection-YOLO4-jetsonNano
 // ./QtOpencvQml -platform eglf
 //
+
+// rm -rf build && mkdir build && cd build && cmake .. -DCMAKE_PREFIX_PATH=/usr/local/QtPath/ && make
 
 int main(int argc, char *argv[])
 {
